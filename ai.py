@@ -11,16 +11,19 @@ client = InferenceClient(
     api_key=HF_TOKEN
 )
 
-def get_ai_reply(user_message: str) -> str:
+def get_ai_reply(user_message: str, history: list) -> str:
     try:
         # this sends your message ai model
         response = client.chat.completions.create(
-            model="Qwen/Qwen3-235B-A22B:novita",
+            model="Qwen/Qwen2.5-7B-Instruct",
             messages =[
                 {
                     'role': 'system',
                     'content':'You are a friendly customer support agent. Answer helpfully and concisely in under 80 words.'
                 },
+
+                *history,
+
                 {
                     'role':'user',
                     'content': user_message
