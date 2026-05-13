@@ -5,10 +5,14 @@ from dotenv import load_dotenv
 import os
 import ai
 import memory
+import faq
 
 # load our .env file
 load_dotenv()
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+
+# Add website url only if required
+faq.load(website_url=None)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.first_name

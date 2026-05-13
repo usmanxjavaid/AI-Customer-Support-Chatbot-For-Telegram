@@ -1,4 +1,5 @@
 import os
+import faq
 from huggingface_hub import InferenceClient
 from dotenv import load_dotenv
 load_dotenv()
@@ -19,7 +20,7 @@ def get_ai_reply(user_message: str, history: list) -> str:
             messages =[
                 {
                     'role': 'system',
-                    'content':'You are a friendly customer support agent. Answer helpfully and concisely in under 80 words.'
+                    'content':faq.get_system_prompt()
                 },
 
                 *history,
