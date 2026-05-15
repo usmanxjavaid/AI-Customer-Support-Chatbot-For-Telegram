@@ -12,7 +12,7 @@ load_dotenv()
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 
 # Add website url only if required
-faq.load(website_url=None)
+faq.load(website_url='https://www.systemsltd.com/')
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     name = update.effective_user.first_name
