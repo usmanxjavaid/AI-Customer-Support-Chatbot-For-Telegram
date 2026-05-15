@@ -6,17 +6,28 @@ import os
 import ai
 import memory
 import faq
+import database
 
 # load our .env file
 load_dotenv()
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 
+# Initialize database when at the start
+database.init_db()
+
 # Add website url only if required
-faq.load(website_url='https://www.systemsltd.com/')
+faq.load(website_url='https://nvidia.custhelp.com/app/answers/detail/a_id/4732')
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    name = update.effective_user.first_name
+    user = update.effective_user
+    name = user.first_name
 
+    # Save user when they type /start
+    database.save_user(
+    telegram_id = user.id,
+    first_name=user.first_name,
+    username=user.username or "")
+    
     # Each list inside keyboard = one horizontal row of buttons
     # Each InlineKeyboardButton has:
     #  text = what user sees on the button
@@ -66,7 +77,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
+    user = update.effective_user
+    user_id = user.id
     user_message = update.message.text
 
     # show "typing..." while we wait for AI response
@@ -83,6 +95,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Save both messages(user, assistant) to memory using add_message func after getting reply
     memory.add_message(user_id, 'user', user_message)
     memory.add_message(user_id, 'assistant', reply)
+
+    # Save user if they skipped /start
+    database.save_user(
+    telegram_id = user.id,
+    first_name=user.first_name,
+    username=user.username or "")
+
+    # Save message permanently
+    database.save_message(user_id, 'user', user_message)
+    database.save_message(user_id, 'assistant', reply)
     
     await update.message.reply_text(
     reply + "\n\n_💡 Tip: /start for menu • /reset to clear chat_",

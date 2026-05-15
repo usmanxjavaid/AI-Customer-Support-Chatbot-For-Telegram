@@ -12,10 +12,10 @@ def load(website_url: str = None):
 
 def get_system_prompt() -> str:
     if not _knowledge:
-        return "You are a friendly customer support agent. Answer helpfully in under 80 words."
+        return "You are a friendly customer support agent by Nexora. Answer helpfully in under 80 words."
     
-    return f"""You are a friendly customer support agent.
-    Answeer ONLY based on the business information below.
+    return f"""You are a friendly customer support agent by Nexora.
+    Answer ONLY based on the business information below.
     If something is not covered say: "I don't have that information. Please contact us directly.
     Keep answers under 80 words."
     {_knowledge}"""
