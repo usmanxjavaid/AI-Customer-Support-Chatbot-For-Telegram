@@ -26,11 +26,11 @@ def from_docx(file_path: str) -> str:
 # From Website
 def from_website(url: str) -> str:
     response = requests.get(url, timeout=10)
-    soup = BeautifulSoup(response.text, 'html_parser')
+    soup = BeautifulSoup(response.text, 'html.parser')
     for tag in soup(['nav', 'footer', 'script', 'style']):
         tag.decompose()
     text = soup.get_text(separator='\n')
-    text = 'n'.join(line.strip() for line in splitlines() if line.strip())
+    text = 'n'.join(line.strip() for line in text.splitlines() if line.strip())
     return text[:3000]
 
 
