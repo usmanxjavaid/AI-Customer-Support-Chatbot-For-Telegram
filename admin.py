@@ -16,7 +16,10 @@ async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Get stats from database
     total_users, total_messages = database.get_stats()
-    feedback = databse.get_feedback_stats()
+    feedback = database.get_feedback_stats()
+
+    positive = sum(count for f, count in feedback if f == 'positive')
+    negative = sum(count for f, count in feedback if f == 'negative')
 
     await update.message.reply_text(
         f"📊 *Admin Panel*\n\n"
@@ -41,8 +44,8 @@ async def users(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = "👥 *All Users*\n\n"
     for u in all_users:
         telegram_id, first_name, username, joined_at = u
-        msg += f"First Name*{first_name}*"
-        msg += f"\nUsername(@{username})" if username else""
+        msg += f"First Name:*{first_name}*"
+        msg += f"\nUsername: (@{username})" if username else""
         msg += f"\n ID: `{telegram_id}`"
         msg += f"\n Joined: {joined_at}\n\n"
 
