@@ -114,8 +114,8 @@ def get_stats():
     return total_users, total_messages
 
 
-
-
+# you can use below command to check number of users and messages (e.g. (1,4))
+# python -c "import database; print(database.get_stats())"
 
 
 

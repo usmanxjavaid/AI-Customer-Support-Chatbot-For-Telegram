@@ -7,6 +7,7 @@ import ai
 import memory
 import faq
 import database
+import admin
 
 # load our .env file
 load_dotenv()
@@ -17,6 +18,7 @@ database.init_db()
 
 # Add website url only if required
 faq.load(website_url='https://nvidia.custhelp.com/app/answers/detail/a_id/4732')
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -118,10 +120,12 @@ async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text('✅ Conversation cleared! Start fresh.')
 
 
-
 app = Application.builder().token(TELEGRAM_TOKEN).build()
 app.add_handler(CommandHandler('start',start))
 app.add_handler(CommandHandler("reset", reset))
+app.add_handler(CommandHandler("admin", admin.admin))
+app.add_handler(CommandHandler("users", admin.users))
+app.add_handler(CommandHandler("history", admin.history))
 app.add_handler(CallbackQueryHandler(button_handler))
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 app.run_polling()
