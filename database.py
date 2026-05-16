@@ -75,6 +75,7 @@ def save_message(telegram_id: int, role: str, message: str):
     conn.commit()
     conn.close()
 
+# Get all users data
 def get_all_users():
     """Returns list of all users"""
     conn = get_connection()
@@ -84,6 +85,7 @@ def get_all_users():
     conn.close()
     return users
 
+# get all users conversations
 def get_user_conversations(telegram_id: int):
     """Returns all messages for a specific user"""
     conn = get_connection()
@@ -99,6 +101,7 @@ def get_user_conversations(telegram_id: int):
     conn.close()
     return messages
 
+# Get basic stats like total users and total messages
 def get_stats():
     """Return basic stats for admin panel"""
     conn = get_connection()
@@ -117,6 +120,47 @@ def get_stats():
 # you can use below command to check number of users and messages (e.g. (1,4))
 # python -c "import database; print(database.get_stats())"
 
+
+# Save user feedback 
+def save_feedback(telegram_id: int, message: str, feedback: str):
+    """Saves user feedback for a specific message"""
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Create feedback table if not exists
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS feedback (
+        id INTEGER PRIMARY KEY,
+        telegram_id INTEGER,
+        message TEXT,
+        feedback TEXT,
+        timestamp TEXT
+                   )
+    ''')
+
+    cursor.execute('''
+        INSERT INTO feedback (telegram_id, message, feedback, timestamp)
+        VALUES (?, ?, ?, ?)
+    ''', (telegram_id, message, feedback, 
+        datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    
+    conn.commit()
+    conn.close()
+
+# Get feedback stats
+def get_feedback_stats():
+    """Return count of positive and negative feedback"""
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT feedback, count(*) FROM feedback GROUP BY feedback")
+        stats = cursor.fetchall()
+    except:
+        stats = []
+
+    conn.close()
+    return stats
 
 
 

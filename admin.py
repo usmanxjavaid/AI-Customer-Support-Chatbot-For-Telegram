@@ -16,11 +16,14 @@ async def admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Get stats from database
     total_users, total_messages = database.get_stats()
+    feedback = databse.get_feedback_stats()
 
     await update.message.reply_text(
         f"📊 *Admin Panel*\n\n"
         f"👥 Total Users: {total_users}\n"
-        f"💬 Total Messages: {total_messages}\n",
+        f"💬 Total Messages: {total_messages}\n"
+        f"👍 Postive Feedback: {positive}\n"
+        f"👎 Negative Feedback: {negative}",
         parse_mode="Markdown"
     )
 
@@ -72,8 +75,10 @@ async def history(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg, parse_mode='Markdown')
 
 
-
-
+# Commands for admin panel
+# /admin
+# /users
+# /history [user_id]
 
 
 

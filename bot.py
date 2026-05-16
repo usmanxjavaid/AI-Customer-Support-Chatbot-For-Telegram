@@ -8,6 +8,7 @@ import memory
 import faq
 import database
 import admin
+import rate_limiter
 
 # load our .env file
 load_dotenv()
@@ -78,10 +79,28 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Type /start to go back to the menu."
         )
 
+    elif query.data.startswith("feedback_good_"):
+        database.save_feedback(user_id, query.data[14:], "positive")
+        await query.edit_message_reply_markup(reply_markup=None) # removes button
+        await query.answer("Thanks for your feedback! 😊")
+
+    elif query.data.startswith("feedback_bad_"):
+        database.save_feedback(user_id, query.data[13:], "negative")
+        await query.edit_message_reply_markup(reply_markup=None) # reomves button
+        await query.answer("Sorry about that! We'll improve. 🙏")
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     user_id = user.id
     user_message = update.message.text
+
+    # Check rate limit before doing anything
+    if not rate_limiter.is_allowed(user_id):
+        wait = rate_limiter.remaining_time(user_id)
+        await update.message.reply_text(
+            f"⏳ Please wait {wait} seconds before sending any message."
+        )
 
     # show "typing..." while we wait for AI response
     await context.bot.send_chat_action(
@@ -107,10 +126,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Save message permanently
     database.save_message(user_id, 'user', user_message)
     database.save_message(user_id, 'assistant', reply)
+
+    # Show reply with feedback buttons
+    keyboard = [[
+        InlineKeyboardButton("👍 Helpful", callback_data=f"feedback_good_{user_message[:30]}"),
+        InlineKeyboardButton("👎 Not Helpful", callback_data=f"feedbacl_bad_{user_message[:30]}")
+    ]]
     
     await update.message.reply_text(
     reply + "\n\n_💡 Tip: /start for menu • /reset to clear chat_",
-    parse_mode="Markdown")
+    parse_mode="Markdown",
+    reply_markup=InlineKeyboardMarkup(keyboard)
+    )
 
 # /reset command clears conversation
 async def reset(update: Update, context: ContextTypes.DEFAULT_TYPE):
